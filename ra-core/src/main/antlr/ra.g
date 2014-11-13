@@ -33,7 +33,8 @@ protected NEWLINE
 //        {System.getProperty("line.separator").equals("\n")}? '\n' |
 //        {System.getProperty("line.separator").equals("\r\n")}? "\r\n") {
             newline();
-            RA.prompt(getLine());
+// FIXME: temporarily remove line numbers (?) to remove coupling to main RA class
+//            RA.prompt(getLine());
         }
     ;
 protected WHITE_SPACE_NO_NEWLINE : ' '|'\t'|'\f';
