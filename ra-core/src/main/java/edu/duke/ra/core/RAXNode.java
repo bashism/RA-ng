@@ -117,26 +117,6 @@ public abstract class RAXNode {
         return;
     }
 
-    public static class ValidateException extends Exception {
-        protected SQLException _sqlException;
-        protected RAXNode _errorNode;
-        public ValidateException(SQLException sqlException, RAXNode errorNode) {
-            _sqlException = sqlException;
-            _errorNode = errorNode;
-        }
-        public ValidateException(String message, RAXNode errorNode) {
-            super(message);
-            _sqlException = null;
-            _errorNode = errorNode;
-        }
-        public SQLException getSQLException() {
-            return _sqlException;
-        }
-        public RAXNode getErrorNode() {
-            return _errorNode;
-        }
-    }
-
     public static class TABLE extends RAXNode {
         protected String _tableName;
         public TABLE(String tableName) {
