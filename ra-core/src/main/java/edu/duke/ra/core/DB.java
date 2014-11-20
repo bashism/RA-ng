@@ -80,8 +80,7 @@ public class DB {
         }
     }
 
-    public DB(String connURL, Properties connProperties)
-        throws Exception {
+    public DB(String connURL, Properties connProperties) throws SQLException {
         _conn = DriverManager.getConnection(connURL, connProperties);
         _driverName = DriverManager.getDriver(connURL).getClass().getName();
         _schema = connProperties.getProperty("schema");
