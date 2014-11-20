@@ -1,0 +1,5 @@
+REQUIREMENTS:
+
+Java 7 or higher
+Servlet 3.0 or higher (Tomcat 7 or higher, etc.)
+Maven 3
