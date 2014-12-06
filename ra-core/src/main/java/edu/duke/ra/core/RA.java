@@ -16,12 +16,12 @@ public class RA {
         this.config = config;
         this.database = database;
     }
-    public QueryResult query(String query) throws SQLException{
+    public IQueryResult query(String query) throws SQLException{
         AST queryAST = parseQuery(query);
         RAXNode queryCommandTree = generateCommandTree(queryAST);
         String querySQL = generateSQLQuery(queryCommandTree, this.database);
 
-        QueryResult queryResult = executeQuery(querySQL);        
+        IQueryResult queryResult = executeQuery(querySQL);        
         return queryResult;
     }
     AST parseQuery(String query) {
@@ -87,7 +87,7 @@ public class RA {
         return withStatementBuilder;
     }
 
-    QueryResult executeQuery(String query) throws SQLException{
+    IQueryResult executeQuery(String query) throws SQLException{
         return database.executeQuery(query);
     }
 }

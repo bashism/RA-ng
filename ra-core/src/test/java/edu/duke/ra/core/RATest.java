@@ -117,6 +117,6 @@ public class RATest {
         String sqlQuery = "WITH RA_TMP_VIEW_1 AS (SELECT DISTINCT * FROM beer),\n"
                 + "RA_TMP_VIEW_2 AS (SELECT * FROM RA_TMP_VIEW_1)\n"
                 + "SELECT * FROM RA_TMP_VIEW_2;";
-        QueryResult result = ra.executeQuery(sqlQuery);
+        IQueryResult result = ra.executeQuery(sqlQuery);
     }
 }

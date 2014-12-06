@@ -226,11 +226,11 @@ public class DB {
         return;
     }
 
-    public QueryResult executeQuery(String query) throws SQLException {
-        QueryResult result;
+    public IQueryResult executeQuery(String query) throws SQLException {
+        IQueryResult result;
         Statement statement = _conn.createStatement();
         ResultSet resultSet = statement.executeQuery(query);
-        result = new QueryResult(resultSet);
+        result = new StandardQueryResult(resultSet);
         return result;
     }
 

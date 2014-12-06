@@ -7,12 +7,16 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
-public class QueryResult {
+/**
+ * A result returning a list of tuples
+ *
+ */
+public class StandardQueryResult implements IQueryResult {
     List<Column> outputSchema = new ArrayList<>();
     List<List<String>> results = new ArrayList<>();
-    String error;
+    
 
-    public QueryResult(ResultSet resultSet) throws SQLException{
+    public StandardQueryResult(ResultSet resultSet) throws SQLException{
         outputSchema = processColumnSchema(resultSet);
         results = processResultSet(resultSet);
     }
@@ -45,6 +49,7 @@ public class QueryResult {
         return resultSet.getString(column);
     }
 
+    @Override
     public String toRawString(){
         StringBuilder output = new StringBuilder();
         appendSchema(output);
@@ -82,6 +87,7 @@ public class QueryResult {
         builder.append("Total number of rows: " + results.size() + "\n\n");
     }
 
+    @Override
     public String toJsonString(){
         return "";
     }
