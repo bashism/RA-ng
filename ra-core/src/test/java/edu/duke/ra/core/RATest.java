@@ -108,10 +108,9 @@ public class RATest {
         assertEquals(queryExpected, SqlQuery);
     }
     /**
-     * Test execution of a query:
-     * \\project_{name} (\\select_{name = 'Corona'} beer)
-     * @throws SQLException 
+     * Test actual execution of a generated query.
      * 
+     * @throws SQLException If something went wrong with SQL execution
      */
     @Test
     public void testExecuteQuery() throws SQLException{
