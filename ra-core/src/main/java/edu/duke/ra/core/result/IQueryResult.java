@@ -1,4 +1,4 @@
-package edu.duke.ra.core;
+package edu.duke.ra.core.result;
 
 /**
  * An interface to get the result of an RA query

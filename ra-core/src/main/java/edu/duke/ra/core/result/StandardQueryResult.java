@@ -1,4 +1,4 @@
-package edu.duke.ra.core;
+package edu.duke.ra.core.result;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -89,7 +89,7 @@ public class StandardQueryResult implements IQueryResult {
 
     @Override
     public String toJsonString(){
-        return "";
+        return "{}";
     }
 
     @Override

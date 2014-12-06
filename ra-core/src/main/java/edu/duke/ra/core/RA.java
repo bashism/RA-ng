@@ -8,6 +8,15 @@ import antlr.collections.AST;
 import java.sql.*;
 import java.io.*;
 
+import edu.duke.ra.core.db.DB;
+import edu.duke.ra.core.operator.RAXNode;
+import edu.duke.ra.core.query.ListQuery;
+import edu.duke.ra.core.query.SqlExecQuery;
+import edu.duke.ra.core.query.StandardQuery;
+import edu.duke.ra.core.result.HelpQueryResult;
+import edu.duke.ra.core.result.IQueryResult;
+import edu.duke.ra.core.result.QuitQueryResult;
+
 public class RA {
     private RAConfig config;
     private DB database;
@@ -18,13 +27,20 @@ public class RA {
     }
     public IQueryResult query(String query) throws SQLException{
         AST queryAST = parseQuery(query);
-        RAXNode queryCommandTree = generateCommandTree(queryAST);
-        String querySQL = generateSQLQuery(queryCommandTree, this.database);
-
-        IQueryResult queryResult = executeQuery(querySQL);        
-        return queryResult;
+        switch (queryAST.getType()) {
+            case RALexerTokenTypes.QUIT: case RALexerTokenTypes.EOF:
+                return new QuitQueryResult();
+            case RALexerTokenTypes.HELP:
+                return new HelpQueryResult();
+            case RALexerTokenTypes.LIST:
+                return new ListQuery(database).query(queryAST);
+            case RALexerTokenTypes.SQLEXEC:
+                return new SqlExecQuery(database).query(queryAST);
+            default:
+                return new StandardQuery(database).query(queryAST);
+        }
     }
-    AST parseQuery(String query) {
+    public AST parseQuery(String query) {
         Reader queryReader = new StringReader(query);
         RALexer lexer = new RALexer(queryReader);
         RAParser parser = new RAParser(lexer);
@@ -37,57 +53,5 @@ public class RA {
         }
         AST ast = parser.getAST();
         return ast;
-    }
-    RAXNode generateCommandTree(AST ast){
-        RAXConstructor constructor = new RAXConstructor();
-        RAXNode raxTree = null;
-        try {
-            raxTree = constructor.expr(ast);
-        }
-        //FIXME: throw this up
-        catch (RecognitionException e) {
-            System.out.println("FIXME: parser error");
-        }
-        return raxTree;
-        
-    }
-
-    String generateSQLQuery(RAXNode commandRoot, DB database) {
-    	StringBuilder querySQL = new StringBuilder("WITH ");
-    	querySQL.append(generateTempViewDefinitions(commandRoot, database, 0));
-        querySQL.append("SELECT * FROM " + commandRoot.getViewName() + ";");
-        return querySQL.toString();
-    }
-
-    StringBuilder generateTempViewDefinitions(RAXNode commandRoot, DB database, int depth){
-        StringBuilder queryBuilder = new StringBuilder();
-        for (int i = 0; i < commandRoot.getNumChildren(); i++) {
-            queryBuilder.append(generateTempViewDefinitions(commandRoot.getChild(i), database, depth + 1));
-        }
-        queryBuilder.append(generateWithStatement(commandRoot, database));
-        if (depth > 0) {
-            queryBuilder.append(",");
-        }
-        queryBuilder.append("\n");
-        return queryBuilder;
-    }
-    StringBuilder generateWithStatement(RAXNode node, DB database) {
-        StringBuilder withStatementBuilder = new StringBuilder();
-        //withStatementBuilder.append("WITH ");
-        withStatementBuilder.append(node.getViewName());
-        withStatementBuilder.append(" AS (");
-        try {
-            withStatementBuilder.append(node.genViewDef(database));
-        }
-        //FIXME
-        catch (SQLException | ValidateException e) {
-            System.out.println("FIXME: SQL error");
-        }
-        withStatementBuilder.append(")");
-        return withStatementBuilder;
-    }
-
-    IQueryResult executeQuery(String query) throws SQLException{
-        return database.executeQuery(query);
     }
 }

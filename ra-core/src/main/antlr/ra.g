@@ -1,6 +1,7 @@
 header {
     package edu.duke.ra.core;
     import antlr.CommonAST;
+    import edu.duke.ra.core.operator.*;
 }
 
 //////////////////////////////////////////////////////////////////////

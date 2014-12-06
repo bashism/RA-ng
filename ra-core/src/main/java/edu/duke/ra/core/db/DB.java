@@ -1,4 +1,4 @@
-package edu.duke.ra.core;
+package edu.duke.ra.core.db;
 
 import java.sql.*;
 import java.util.Arrays;
@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.io.PrintStream;
+
+import edu.duke.ra.core.result.IQueryResult;
+import edu.duke.ra.core.result.StandardQueryResult;
 
 public class DB {
 

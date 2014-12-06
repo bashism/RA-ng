@@ -2,6 +2,8 @@ package edu.duke.ra.core;
 
 import java.sql.SQLException;
 
+import edu.duke.ra.core.operator.RAXNode;
+
 public class ValidateException extends Exception {
     private static final long serialVersionUID = -6001535968345951159L;
     protected SQLException _sqlException;

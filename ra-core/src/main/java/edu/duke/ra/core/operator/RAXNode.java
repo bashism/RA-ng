@@ -1,10 +1,13 @@
-package edu.duke.ra.core;
+package edu.duke.ra.core.operator;
 
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.io.PrintStream;
 import java.sql.SQLException;
+
+import edu.duke.ra.core.ValidateException;
+import edu.duke.ra.core.db.DB;
 
 public abstract class RAXNode {
 

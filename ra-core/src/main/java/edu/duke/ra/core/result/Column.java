@@ -1,4 +1,4 @@
-package edu.duke.ra.core;
+package edu.duke.ra.core.result;
 
 public class Column {
     private String name;
