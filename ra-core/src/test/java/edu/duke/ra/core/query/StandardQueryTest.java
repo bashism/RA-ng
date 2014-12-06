@@ -45,15 +45,15 @@ public class StandardQueryTest {
         AST parseQueryResult = ra.parseQuery(query);
 
         RAXNode root = standardQuery.generateCommandTree(parseQueryResult);
-        assertEquals("PROJECT", root.getClass().getSimpleName());
+        assertEquals("Project", root.getClass().getSimpleName());
         assertEquals(1, root.getNumChildren());
 
         RAXNode selectNode = root.getChild(0);
-        assertEquals("SELECT", selectNode.getClass().getSimpleName());
+        assertEquals("Select", selectNode.getClass().getSimpleName());
         assertEquals(1, selectNode.getNumChildren());
 
         RAXNode tableNode = selectNode.getChild(0);
-        assertEquals("TABLE",tableNode.getClass().getSimpleName());
+        assertEquals("Table",tableNode.getClass().getSimpleName());
         assertEquals(0, tableNode.getNumChildren());
     }
     /**

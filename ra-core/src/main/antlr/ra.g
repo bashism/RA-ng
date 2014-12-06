@@ -151,30 +151,30 @@ expr returns [RAXNode r = null] {
     RAXNode input, input1, input2;
 }
     : #(JOIN input1=expr (jc:OPERATOR_OPTION)? input2=expr) {
-            r = new RAXNode.JOIN((jc == null)? null : jc.getText(), input1, input2);
+            r = new Join((jc == null)? null : jc.getText(), input1, input2);
         }
     | #(CROSS input1=expr input2=expr) {
-            r = new RAXNode.CROSS(input1, input2);
+            r = new Cross(input1, input2);
         }
     | #(UNION input1=expr input2=expr) {
-            r = new RAXNode.UNION(input1, input2);
+            r = new Union(input1, input2);
         }
     | #(DIFF input1=expr input2=expr) {
-            r = new RAXNode.DIFF(input1, input2);
+            r = new Diff(input1, input2);
         }
     | #(INTERSECT input1=expr input2=expr) {
-            r = new RAXNode.INTERSECT(input1, input2);
+            r = new Intersect(input1, input2);
         }
     | #(SELECT sc:OPERATOR_OPTION input=expr) {
-            r = new RAXNode.SELECT(sc.getText(), input);
+            r = new Select(sc.getText(), input);
         }
     | #(PROJECT pc:OPERATOR_OPTION input=expr) {
-            r = new RAXNode.PROJECT(pc.getText(), input);
+            r = new Project(pc.getText(), input);
         }
     | #(RENAME rc:OPERATOR_OPTION input=expr) {
-            r = new RAXNode.RENAME(rc.getText(), input);
+            r = new Rename(rc.getText(), input);
         }
     | t:TABLE_NAME {
-            r = new RAXNode.TABLE(t.getText());
+            r = new Table(t.getText());
         }
     ;
