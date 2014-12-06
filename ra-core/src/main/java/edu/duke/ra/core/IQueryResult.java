@@ -11,12 +11,19 @@ public interface IQueryResult {
      * 
      * @return The raw, unstructured string result
      */
-    String toRawString();
+    public String toRawString();
 
     /**
      * Return a JSON representation of the result as a string
      * 
      * @return A JSON string representing the result
      */
-    String toJsonString();
+    public String toJsonString();
+    
+    /**
+     * Check whether the command requested the client to quit
+     * 
+     * @return Whether to quit
+     */
+    public boolean quit(); 
 }

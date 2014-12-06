@@ -91,4 +91,9 @@ public class StandardQueryResult implements IQueryResult {
     public String toJsonString(){
         return "";
     }
+
+    @Override
+    public boolean quit() {
+        return false;
+    }
 }
