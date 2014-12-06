@@ -16,13 +16,12 @@ public class RA {
         this.config = config;
         this.database = database;
     }
-    public QueryResult query(String query){
+    public QueryResult query(String query) throws SQLException{
         AST queryAST = parseQuery(query);
         RAXNode queryCommandTree = generateCommandTree(queryAST);
         String querySQL = generateSQLQuery(queryCommandTree, this.database);
 
-        ResultSet querySQLResult = executeQuery(querySQL);
-        QueryResult queryResult = new QueryResult(querySQLResult);
+        QueryResult queryResult = executeQuery(querySQL);        
         return queryResult;
     }
     AST parseQuery(String query) {
@@ -54,8 +53,8 @@ public class RA {
     }
 
     String generateSQLQuery(RAXNode commandRoot, DB database) {
-    	StringBuilder querySQL =
-    			generateTempViewDefinitions(commandRoot, database, 0);
+    	StringBuilder querySQL = new StringBuilder("WITH ");
+    	querySQL.append(generateTempViewDefinitions(commandRoot, database, 0));
         querySQL.append("SELECT * FROM " + commandRoot.getViewName() + ";");
         return querySQL.toString();
     }
@@ -74,7 +73,7 @@ public class RA {
     }
     StringBuilder generateWithStatement(RAXNode node, DB database) {
         StringBuilder withStatementBuilder = new StringBuilder();
-        withStatementBuilder.append("WITH ");
+        //withStatementBuilder.append("WITH ");
         withStatementBuilder.append(node.getViewName());
         withStatementBuilder.append(" AS (");
         try {
@@ -88,8 +87,7 @@ public class RA {
         return withStatementBuilder;
     }
 
-    //TODO
-    ResultSet executeQuery(String query){
-        return null;
+    QueryResult executeQuery(String query) throws SQLException{
+        return database.executeQuery(query);
     }
 }

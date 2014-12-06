@@ -226,9 +226,17 @@ public class DB {
         return;
     }
 
+    public QueryResult executeQuery(String query) throws SQLException {
+        QueryResult result;
+        Statement statement = _conn.createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+        result = new QueryResult(resultSet);
+        return result;
+    }
+
     public void execQueryAndOutputResult(PrintStream out, String query)
         throws SQLException {
-        Statement s = _conn.createStatement();
+    	Statement s = _conn.createStatement();
         ResultSet rs = s.executeQuery(query);
         printResultSet(out, rs);
         rs.close();

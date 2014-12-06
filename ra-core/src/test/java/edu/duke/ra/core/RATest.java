@@ -102,9 +102,22 @@ public class RATest {
         RAXNode root = ra.generateCommandTree(parseQueryResult);
         String SqlQuery = ra.generateSQLQuery(root, database);
         String queryExpected = "WITH RA_TMP_VIEW_1 AS (SELECT DISTINCT * FROM beer),\n"
-        		+ "WITH RA_TMP_VIEW_2 AS (SELECT * FROM RA_TMP_VIEW_1 WHERE name = 'Corona'),\n"
-        		+ "WITH RA_TMP_VIEW_3 AS (SELECT DISTINCT name FROM RA_TMP_VIEW_2)\n"
+        		+ "RA_TMP_VIEW_2 AS (SELECT * FROM RA_TMP_VIEW_1 WHERE name = 'Corona'),\n"
+        		+ "RA_TMP_VIEW_3 AS (SELECT DISTINCT name FROM RA_TMP_VIEW_2)\n"
         		+ "SELECT * FROM RA_TMP_VIEW_3;";
         assertEquals(queryExpected, SqlQuery);
+    }
+    /**
+     * Test execution of a query:
+     * \\project_{name} (\\select_{name = 'Corona'} beer)
+     * @throws SQLException 
+     * 
+     */
+    @Test
+    public void testExecuteQuery() throws SQLException{
+        String sqlQuery = "WITH RA_TMP_VIEW_1 AS (SELECT DISTINCT * FROM beer),\n"
+                + "RA_TMP_VIEW_2 AS (SELECT * FROM RA_TMP_VIEW_1)\n"
+                + "SELECT * FROM RA_TMP_VIEW_2;";
+        QueryResult result = ra.executeQuery(sqlQuery);
     }
 }
