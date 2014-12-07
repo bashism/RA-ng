@@ -10,7 +10,7 @@ import java.io.*;
 
 import edu.duke.ra.core.db.DB;
 import edu.duke.ra.core.operator.RAXNode;
-import edu.duke.ra.core.query.ListQuery;
+import edu.duke.ra.core.query.ListRelationQuery;
 import edu.duke.ra.core.query.SqlExecQuery;
 import edu.duke.ra.core.query.StandardQuery;
 import edu.duke.ra.core.result.HelpQueryResult;
@@ -33,7 +33,7 @@ public class RA {
             case RALexerTokenTypes.HELP:
                 return new HelpQueryResult();
             case RALexerTokenTypes.LIST:
-                return new ListQuery(database).query(queryAST);
+                return new ListRelationQuery(database).query(queryAST);
             case RALexerTokenTypes.SQLEXEC:
                 return new SqlExecQuery(database).query(queryAST);
             default:

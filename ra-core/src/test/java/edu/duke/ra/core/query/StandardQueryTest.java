@@ -87,6 +87,20 @@ public class StandardQueryTest {
         String sqlQuery = "WITH RA_TMP_VIEW_1 AS (SELECT DISTINCT * FROM beer),\n"
                 + "RA_TMP_VIEW_2 AS (SELECT * FROM RA_TMP_VIEW_1)\n"
                 + "SELECT * FROM RA_TMP_VIEW_2;";
+        String expected = ""
+                + "Output schema: (name VARCHAR, brewer VARCHAR)\n" 
+                + "-----\n" 
+                + "Amstel|Amstel Brewery\n" 
+                + "Budweiser|Anheuser-Busch Inc.\n" 
+                + "Corona|Grupo Modelo\n" 
+                + "Dixie|Dixie Brewing\n" 
+                + "Erdinger|Erdinger Weissbrau\n" 
+                + "Full Sail|Full Sail Brewing\n" 
+                + "-----\n" 
+                + "Total number of rows: 6\n\n"
+                ;
+
         IQueryResult result = standardQuery.executeQuery(sqlQuery);
+        assertEquals(expected, result.toRawString());
     }
 }
