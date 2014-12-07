@@ -15,7 +15,7 @@ public class ListRelationQuery extends DatabaseQuery{
     }
 
     @Override
-    public IQueryResult query(AST query) {
+    public IQueryResult query(AST queryAST) {
         ArrayList<String> tables = null;
         try {
             tables = database.getTables();

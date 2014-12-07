@@ -102,7 +102,7 @@ public class DB {
         return;
     }
 
-    public void execCommands(PrintStream out, String commands)
+    public void execCommands(StringBuilder out, String commands)
         throws SQLException {
         Statement s = _conn.createStatement();
         int resultNum = 0;
@@ -116,7 +116,7 @@ public class DB {
                     queryResult = s.getMoreResults();
                 }
             } catch (SQLException e) {
-                out.println("*** Result " + resultNum + " is an error: " + e.getMessage());
+                out.append("*** Result " + resultNum + " is an error: " + e.getMessage() + "\n");
                 /*
                  * JDBC API for handling multiple results is a mess.
                  * 
@@ -148,9 +148,10 @@ public class DB {
                 break;
             }
             if (queryResult) {
-                out.println("*** Result " + resultNum + " is a table:");
+                out.append("*** Result " + resultNum + " is a table:\n");
                 ResultSet rs = s.getResultSet();
-                printResultSet(out, rs);
+                StandardQueryResult qrs = new StandardQueryResult(rs);
+                out.append(qrs.toRawString());
                 rs.close();
             } else {
                 int rowsAffected = s.getUpdateCount();
@@ -158,7 +159,7 @@ public class DB {
                     resultNum--;
                     break;
                 }
-                out.println("*** Result " + resultNum + " is an update count of " + rowsAffected);
+                out.append("*** Result " + resultNum + " is an update count of " + rowsAffected + "\n");
             }
         }
         s.close();
