@@ -83,4 +83,15 @@ public class PrettyPrinter {
         }
         return tuples;
     }
+    public static List<String> createRelationsFromJson(String json) {
+        JSONObject resultJson = new JSONObject(json);
+        JSONArray relationsJson = resultJson.getJSONObject("data")
+                .getJSONArray("relations");
+        List<String> relations = new ArrayList<>();
+        for (int i = 0; i < relationsJson.length(); i++) {
+            String relation = relationsJson.getString(i);
+            relations.add(relation);
+        }
+        return relations;
+    }
 }
