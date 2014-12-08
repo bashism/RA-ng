@@ -120,4 +120,16 @@ public class StandardQueryTest {
         List<List<String>> results = PrettyPrinter.createTuplesFromJson(result.toJsonString());
         assertEquals(expected, PrettyPrinter.printTuples(outputSchema, results));
     }
+    @Test
+    public void testSelect(){
+        String query = "\\select_{name='Amstel'} Beer;\n";
+        List<List<String>> expected = new ArrayList<>();
+        List<String> expectedTuple = new ArrayList<>();
+        expectedTuple.add("Amstel"); expectedTuple.add("Amstel Brewery");
+        expected.add(expectedTuple);
+        IQueryResult result = ra.query(query);
+        assertEquals("edu.duke.ra.core.result.StandardQueryResult", result.getClass().getName());
+        List<List<String>> resultTuples = PrettyPrinter.createTuplesFromJson(result.toJsonString());
+        assertEquals(expected, resultTuples);
+    }
 }

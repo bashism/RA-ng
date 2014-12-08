@@ -45,7 +45,8 @@ public class StandardQuery extends DatabaseQuery {
         List<RAException> errors = new ArrayList<>();
         try {
             RAXNode queryCommandTree = generateCommandTree(queryAST);
-            queryCommandTree.validate(database);
+            // This assumes that we are still using views, not WITH statements
+            // queryCommandTree.validate(database);
             return new ValueWithError<RAXNode>(queryCommandTree, null);
         }
         catch (RecognitionException exception) {
@@ -57,6 +58,7 @@ public class StandardQuery extends DatabaseQuery {
                     exception));
             return new ValueWithError<RAXNode>(null, new ErrorResult(raQueryString, errors));
         }
+        /*
         catch (ValidateException exception) {
             errors.add(new RAException(
                     "ValidateException",
@@ -65,6 +67,7 @@ public class StandardQuery extends DatabaseQuery {
                     exception));
             return new ValueWithError<RAXNode>(null, new ErrorResult(raQueryString, errors));
         }
+        */
     }
 
     RAXNode generateCommandTree(AST ast) throws RecognitionException {
