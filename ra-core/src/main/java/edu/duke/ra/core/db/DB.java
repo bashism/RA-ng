@@ -7,42 +7,11 @@ import java.util.ArrayList;
 import java.util.Properties;
 import java.io.PrintStream;
 
+import edu.duke.ra.core.RAException;
 import edu.duke.ra.core.result.IQueryResult;
 import edu.duke.ra.core.result.StandardQueryResult;
 
 public class DB {
-
-    public class TableSchema {
-        protected String _tableName;
-        protected ArrayList<String> _colNames;
-        protected ArrayList<String> _colTypes;
-        public TableSchema(String tableName, ArrayList<String> colNames, ArrayList<String> colTypes) {
-            _tableName = tableName;
-            _colNames = colNames;
-            _colTypes = colTypes;
-        }
-        public String getTableName() {
-            return _tableName;
-        }
-        public ArrayList<String> getColNames() {
-            return _colNames;
-        }
-        public ArrayList<String> getColTypes() {
-            return _colTypes;
-        }
-        public String toPrintString() {
-            String s = _tableName;
-            s += "(";
-            for (int i=0; i<_colNames.size(); i++) {
-                if (i>0) s+= ", ";
-                s += _colNames.get(i);
-                s += " ";
-                s += _colTypes.get(i);
-            }
-            s += ")";
-            return s;
-        }
-    }
 
     public static void printSQLExceptionDetails(SQLException sqle, PrintStream err, boolean verbose) {
         while (sqle != null) {
@@ -150,7 +119,8 @@ public class DB {
             if (queryResult) {
                 out.append("*** Result " + resultNum + " is a table:\n");
                 ResultSet rs = s.getResultSet();
-                StandardQueryResult qrs = new StandardQueryResult(rs);
+                List<RAException> errors = new ArrayList<>();
+                StandardQueryResult qrs = new StandardQueryResult(rs, errors, "", commands);
                 out.append(qrs.toRawString());
                 rs.close();
             } else {
@@ -230,11 +200,12 @@ public class DB {
         return;
     }
 
-    public IQueryResult executeQuery(String query) throws SQLException {
-        IQueryResult result;
+    public IQueryResult executeQuery(String query, String raQueryString, boolean verbose) throws SQLException {
+        List<RAException> errors = new ArrayList<>();
+        ResultSet resultSet = null;
         Statement statement = _conn.createStatement();
-        ResultSet resultSet = statement.executeQuery(query);
-        result = new StandardQueryResult(resultSet);
+        resultSet = statement.executeQuery(query);
+        IQueryResult result = new StandardQueryResult(resultSet, errors, raQueryString, query);
         return result;
     }
 
@@ -307,6 +278,7 @@ public class DB {
     //     return new TableSchema(tableName, colNames, colTypes);
     // }
 
+    /*
     public void createView(String createViewStatement)
         throws SQLException {
         Statement s = _conn.createStatement();
@@ -322,5 +294,6 @@ public class DB {
         s.close();
         return;
     }
+    */
 
 }

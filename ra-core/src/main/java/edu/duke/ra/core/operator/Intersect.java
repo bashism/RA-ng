@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 import edu.duke.ra.core.ValidateException;
 import edu.duke.ra.core.db.DB;
+import edu.duke.ra.core.db.TableSchema;
 
 public class Intersect extends RAXNode {
     public Intersect(RAXNode input1, RAXNode input2) {
@@ -18,8 +19,8 @@ public class Intersect extends RAXNode {
             // First, get the input schema of the children, which
             // should have already been validated so their views
             // have been created at this point:
-            DB.TableSchema input1Schema = db.getTableSchema(getChild(0).getViewName());
-            DB.TableSchema input2Schema = db.getTableSchema(getChild(1).getViewName());
+            TableSchema input1Schema = db.getTableSchema(getChild(0).getViewName());
+            TableSchema input2Schema = db.getTableSchema(getChild(1).getViewName());
             if (input1Schema.getColNames().size() !=
                 input2Schema.getColNames().size()) {
                 throw new ValidateException("intersecting relations with different numbers of columns", this);

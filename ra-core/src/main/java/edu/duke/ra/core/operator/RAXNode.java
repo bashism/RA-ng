@@ -8,6 +8,7 @@ import java.sql.SQLException;
 
 import edu.duke.ra.core.ValidateException;
 import edu.duke.ra.core.db.DB;
+import edu.duke.ra.core.db.TableSchema;
 
 public abstract class RAXNode {
 
@@ -24,7 +25,7 @@ public abstract class RAXNode {
 
     protected Status _status;
     protected String _viewName;
-    protected DB.TableSchema _outputSchema;
+    protected TableSchema _outputSchema;
     protected ArrayList<RAXNode> _children;
     protected RAXNode(ArrayList<RAXNode> children) {
         _status = Status.UNCHECKED;
@@ -64,6 +65,7 @@ public abstract class RAXNode {
         }
         return;
     }
+
     public void validate(DB db)
         throws ValidateException {
         // Validate children first; any exception thrown there
@@ -72,19 +74,6 @@ public abstract class RAXNode {
             getChild(i).validate(db);
         }
         try {
-            // Drop the view, just in case it is left over from
-            // a previous run (shouldn't have happened if it was
-            // a clean run):
-            db.dropView(_viewName);
-        } catch (SQLException e) {
-            // Simply ignore; this is probably not safe.  I would
-            // imagine that we are trying to drop view8 as the root
-            // view, but in a previous run view8 is used to define
-            // view9, so view8 cannot be dropped before view9.  A
-            // robust solution seems nasty.
-        }
-        try {
-            db.createView(genViewCreateStatement(db));
             _outputSchema = db.getTableSchema(_viewName);
             assert(_outputSchema != null);
         } catch (SQLException e) {
@@ -96,27 +85,11 @@ public abstract class RAXNode {
         _status = Status.CORRECT;
         return;
     }
+
     public void execute(DB db, PrintStream out)
         throws SQLException {
         assert(_status == Status.CORRECT);
         db.execQueryAndOutputResult(out, "SELECT * FROM " + _viewName);
-        return;
-    }
-    public void clean(DB db) 
-        throws SQLException {
-        if (_status == Status.UNCHECKED) {
-            // Should be the case that the view wasn't actually created.
-        } else if (_status == Status.CORRECT) {
-            db.dropView(_viewName);
-            _status = Status.UNCHECKED;
-        } else if (_status == Status.ERROR) {
-            // The view shouldn't have been created successfully; no
-            // need to drop.
-            _status = Status.UNCHECKED;
-        }
-        for (int i=0; i<getNumChildren(); i++) {
-            getChild(i).clean(db);
-        }
         return;
     }
 

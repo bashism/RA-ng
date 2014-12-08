@@ -1,7 +1,12 @@
 package edu.duke.ra.core.result;
 
-public class HelpQueryResult implements IQueryResult {
-    
+import java.util.ArrayList;
+import java.util.List;
+
+import edu.duke.ra.core.RAException;
+
+public class HelpQueryResult extends RawStringQueryResult {
+    private static final String query = "\\help;\n";
     private static final String helpMessage = ""
             + "Terminate your commands or expressions by \";\" \n"
             + "\n"
@@ -24,19 +29,9 @@ public class HelpQueryResult implements IQueryResult {
             + "\\rename_{NEW_ATTR_NAME_LIST} EXP: rename all attributes of an expression \n"
             + "\n"
             ;
+    private static final List<RAException> errors = new ArrayList<>();
 
-    @Override
-    public String toRawString() {
-        return helpMessage;
-    }
-
-    @Override
-    public String toJsonString() {
-        return "{}";
-    }
-
-    @Override
-    public boolean quit() {
-        return false;
+    public HelpQueryResult() {
+        super(query, helpMessage, errors);
     }
 }

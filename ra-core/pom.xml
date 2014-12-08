@@ -9,6 +9,11 @@
   <description>The core library for parsing relational algebra expressions and potentially also executing database queries</description>
   <dependencies>
     <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20141113</version>
+    </dependency>
+    <dependency>
       <groupId>antlr</groupId>
       <artifactId>antlr</artifactId>
       <version>2.7.7</version>

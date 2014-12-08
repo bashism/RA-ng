@@ -7,6 +7,7 @@ import java.util.List;
 
 import edu.duke.ra.core.ValidateException;
 import edu.duke.ra.core.db.DB;
+import edu.duke.ra.core.db.TableSchema;
 
 public class Rename extends RAXNode{
     protected String _columns;
@@ -23,7 +24,7 @@ public class Rename extends RAXNode{
             // First, get the input schema of the child, which
             // should have already been validated so its view 
             // has been created at this point:
-            DB.TableSchema inputSchema = db.getTableSchema(getChild(0).getViewName());
+            TableSchema inputSchema = db.getTableSchema(getChild(0).getViewName());
             // Next, parse the list of new column names:
             List<String> columnNames = parseColumnNames(_columns);
             if (inputSchema.getColNames().size() != columnNames.size()) {

@@ -14,6 +14,8 @@ import edu.duke.ra.core.db.DB;
 import edu.duke.ra.core.operator.RAXNode;
 import edu.duke.ra.core.result.IQueryResult;
 import antlr.CommonAST;
+import antlr.RecognitionException;
+import antlr.TokenStreamException;
 import antlr.collections.AST;
 
 public class RATest {
@@ -21,11 +23,11 @@ public class RATest {
     private RA ra;
 
     @Before
-    public void setupDatabase() throws IOException, SQLException{
+    public void setupDatabase() throws IOException, SQLException, RAConfigException{
         Properties properties = new Properties();
 		properties.load(this.getClass().getResourceAsStream("/ra.properties"));
         this.database = new DB(properties.getProperty("url"), properties);
-        this.ra = new RA(new RAConfig(), database);
+        this.ra = new RA(new RAConfig.Builder().build());
     }
     /**
      * Run a simple, nested query:
@@ -37,9 +39,11 @@ public class RATest {
      *  +--\select
      *     +--name = 'Corona'
      *     +--beer
+     * @throws TokenStreamException 
+     * @throws RecognitionException 
      */
     @Test
-    public void testParseQuery(){
+    public void testParseQuery() throws RecognitionException, TokenStreamException{
         //product placement
         String query = "\\project_{name} \\select_{name = 'Corona'} beer;\n";
 

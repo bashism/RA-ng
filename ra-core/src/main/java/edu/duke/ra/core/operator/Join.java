@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.duke.ra.core.db.DB;
+import edu.duke.ra.core.db.TableSchema;
 
 public class Join extends RAXNode {
     protected String _condition;
@@ -17,8 +18,8 @@ public class Join extends RAXNode {
         throws SQLException {
         if (_condition == null) {
             // Natural join:
-            DB.TableSchema input1Schema = db.getTableSchema(getChild(0).getViewName());
-            DB.TableSchema input2Schema = db.getTableSchema(getChild(1).getViewName());
+            TableSchema input1Schema = db.getTableSchema(getChild(0).getViewName());
+            TableSchema input2Schema = db.getTableSchema(getChild(1).getViewName());
             List<String> input1ColumnNames = input1Schema.getColNames();
             List<String> input2ColumnNames = input2Schema.getColNames();
             List<String> joinColumnNames = new ArrayList<String>();
