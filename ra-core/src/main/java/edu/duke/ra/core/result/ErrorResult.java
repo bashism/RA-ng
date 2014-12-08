@@ -13,6 +13,7 @@ public class ErrorResult extends QueryResult {
     public ErrorResult(String query, List<RAException> errors) {
         this.query = query;
         this.errors = errors;
+        makeResult();
     }
 
     @Override

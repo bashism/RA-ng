@@ -47,6 +47,7 @@ public class StandardQueryResult extends QueryResult {
             outputSchema = new ArrayList<>();
             results = new ArrayList<>();
         }
+        makeResult();
     }
 
     List<Column> processColumnSchema(ResultSet resultSet) throws SQLException {

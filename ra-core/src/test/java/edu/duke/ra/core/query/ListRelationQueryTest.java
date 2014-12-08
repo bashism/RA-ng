@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Properties;
 
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,22 +25,15 @@ public class ListRelationQueryTest {
         this.ra = new RA(new RAConfig.Builder().build());
     }
 
-    //FINISHME
     @Test
     public void testQuery(){
         String query = "\\list;\n";
-        String expected = ""
-                + "-----\n"
-                + "Bar\n"
-                + "Beer\n"
-                + "Drinker\n"
-                + "Frequents\n"
-                + "Likes\n"
-                + "Serves\n"
-                + "-----\n"
-                + "Total of 6 table(s) found.\n\n"
-                ;
+        String expectedEntries =
+            "[\"Bar\",\"Beer\",\"Drinker\",\"Frequents\",\"Likes\",\"Serves\"]";
         IQueryResult result = ra.query(query);
         assertEquals("edu.duke.ra.core.result.ListRelationQueryResult",result.getClass().getName());
+        JSONObject resultJson = new JSONObject(result.toJsonString());
+        assertEquals(query, resultJson.getString("query"));
+        assertEquals(expectedEntries, resultJson.getJSONObject("data").getJSONArray("relations").toString());
     }
 }

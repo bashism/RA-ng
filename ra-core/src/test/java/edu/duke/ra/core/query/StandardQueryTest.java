@@ -4,8 +4,12 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,7 +22,9 @@ import edu.duke.ra.core.RAConfigException;
 import edu.duke.ra.core.ValidateException;
 import edu.duke.ra.core.db.DB;
 import edu.duke.ra.core.operator.RAXNode;
+import edu.duke.ra.core.result.Column;
 import edu.duke.ra.core.result.IQueryResult;
+import edu.duke.ra.core.util.PrettyPrinter;
 
 public class StandardQueryTest {
     private DB database;
@@ -91,7 +97,6 @@ public class StandardQueryTest {
      * 
      * @throws SQLException If something went wrong with SQL execution
      */
-    //FINISHME
     @Test
     public void testExecuteQuery() throws SQLException{
         String sqlQuery = "WITH RA_TMP_VIEW_1 AS (SELECT DISTINCT * FROM beer),\n"
@@ -106,10 +111,13 @@ public class StandardQueryTest {
                 + "Dixie|Dixie Brewing\n" 
                 + "Erdinger|Erdinger Weissbrau\n" 
                 + "Full Sail|Full Sail Brewing\n" 
-                + "-----\n" 
+                + "-----\n"
                 + "Total number of rows: 6\n\n"
                 ;
         IQueryResult result = standardQuery.executeQuery(sqlQuery, "asdf", false);
         assertEquals("edu.duke.ra.core.result.StandardQueryResult", result.getClass().getName());
+        List<Column> outputSchema = PrettyPrinter.createSchemaFromJson(result.toJsonString());
+        List<List<String>> results = PrettyPrinter.createTuplesFromJson(result.toJsonString());
+        assertEquals(expected, PrettyPrinter.printTuples(outputSchema, results));
     }
 }

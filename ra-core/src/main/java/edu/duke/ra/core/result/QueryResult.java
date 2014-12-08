@@ -23,6 +23,10 @@ public abstract class QueryResult implements IQueryResult {
 
     private JSONObject result;
 
+    /**
+     * Create the JSON representation of the result. You MUST call this
+     * in the subclasses' constructors
+     */
     protected void makeResult() {
         this.result = new JSONObject();
         this.result.put(queryKey, makeQuery());

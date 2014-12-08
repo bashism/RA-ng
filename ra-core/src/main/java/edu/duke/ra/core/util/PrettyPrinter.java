@@ -1,6 +1,10 @@
 package edu.duke.ra.core.util;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import edu.duke.ra.core.result.Column;
 
@@ -50,5 +54,33 @@ public class PrettyPrinter {
     static void appendSummary(StringBuilder builder, List<List<String>> results) {
         builder.append("-----\n");
         builder.append("Total number of rows: " + results.size() + "\n\n");
+    }
+    public static List<Column> createSchemaFromJson(String json) {
+        JSONObject resultJson = new JSONObject(json);
+        JSONArray schemaJson = resultJson.getJSONObject("data")
+                .getJSONObject("tuples")
+                .getJSONArray("schema");
+        List<Column> outputSchema = new ArrayList<>();
+        for (int i = 0; i < schemaJson.length(); i++){
+            JSONObject schemaDef = schemaJson.getJSONObject(i);
+            outputSchema.add(new Column(schemaDef.getString("name"), schemaDef.getString("type")));
+        }
+        return outputSchema;
+    }
+    public static List<List<String>> createTuplesFromJson(String json) {
+        JSONObject resultJson = new JSONObject(json);
+        JSONArray tuplesJson = resultJson.getJSONObject("data")
+                .getJSONObject("tuples")
+                .getJSONArray("entries");
+        List<List<String>> tuples = new ArrayList<>();
+        for (int i = 0; i < tuplesJson.length(); i++){
+            List<String> row = new ArrayList<>();
+            for (int j = 0; j < tuplesJson.getJSONArray(0).length(); j++){
+                String columnEntry = tuplesJson.getJSONArray(i).getString(j);
+                row.add(columnEntry);
+            }
+            tuples.add(row);
+        }
+        return tuples;
     }
 }

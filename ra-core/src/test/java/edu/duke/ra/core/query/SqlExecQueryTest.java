@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Properties;
 
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,7 +25,6 @@ public class SqlExecQueryTest {
         this.ra = new RA(new RAConfig.Builder().build());
     }
     
-    //FINISHME
     @Test
     public void testQuery() throws SQLException{
         String query = "\\sqlexec_{SELECT * FROM Bar;};\n";
@@ -42,5 +42,8 @@ public class SqlExecQueryTest {
                 ;
         IQueryResult result = ra.query(query);
         assertEquals("edu.duke.ra.core.result.RawStringQueryResult", result.getClass().getName());
+        JSONObject resultJson = new JSONObject(result.toJsonString());
+        assertEquals(query, resultJson.getString("query"));
+        assertEquals(expected, resultJson.getJSONObject("data").getString("text"));
     }
 }
