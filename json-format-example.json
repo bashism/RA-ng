@@ -18,16 +18,9 @@
         {
             "name": "SqlException",
             "description": "",
+            "details": "",
             "message": "something here",
-            "stackTrace": "..."
         }
     ],
     "quit": false
-}
-
-{
-    "text": "\\project_{bar} \\s"
-    "completions": [
-        "\\project_{bar} \\select_{"
-    ]
 }
