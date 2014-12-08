@@ -1,7 +1,6 @@
 package edu.duke.ra.cli;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.sql.*;
@@ -14,10 +13,6 @@ import edu.duke.ra.core.RAConfigException;
 import edu.duke.ra.core.result.Column;
 import edu.duke.ra.core.result.IQueryResult;
 import edu.duke.ra.core.util.PrettyPrinter;
-import antlr.RecognitionException;
-import antlr.TokenStreamException;
-import antlr.CommonAST;
-import antlr.collections.AST;
 import jline.console.ConsoleReader;
 import jline.console.completer.StringsCompleter;
 
@@ -284,7 +279,8 @@ public class Client {
             String resultString = result.toJsonString();
             //TODO: Handle errors
             System.out.println(resultString);
-            JSONObject dataSection = new JSONObject(resultString).getJSONObject("data");
+            JSONObject resultJson = new JSONObject(resultString);
+            JSONObject dataSection = resultJson.getJSONObject("data");
             String resultType = dataSection.keys().next();
             switch (resultType) {
                 case "tuples":
@@ -299,6 +295,9 @@ public class Client {
                 case "text":
                     out.print(dataSection.getString("text"));
                     break;
+            }
+            if (resultJson.getBoolean("quit")) {
+                break;
             }
         }
     }
