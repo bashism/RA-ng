@@ -8,7 +8,7 @@ REST API build steps:
         - if not already, service tomcat start
         - cp sample.db /sample.db
         - cp target/ra-ws.war $CATALINA_HOME/webapps
-        - point browser to localhost:8080/ra-ws/api?query=
+        - point browser to localhost:8080/ra-ws/api/query?query=YOUR QUERY
 
 CLI build steps
         - ra-core: mvn install
