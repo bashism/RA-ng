@@ -1,0 +1,33 @@
+{
+    "query": "likes;\n",
+    "data": {
+        "tuples": {
+            "schema": [
+                {"name": "drinker", "type": "VARCHAR" },
+                {"name": "beer", "type": "VARCHAR" }
+            ],
+            "entries": [
+                ["Dan", "Corona"],
+                ["Ben", "Amstel"]
+            ]
+        },
+        "relations": ["Beer", "Likes"],
+        "text": "Terminate your commands or expressions by \\";\\" \\n"
+    },
+    "errors": [
+        {
+            "name": "SqlException",
+            "description": "",
+            "message": "something here",
+            "stackTrace": "..."
+        }
+    ],
+    "quit": false
+}
+
+{
+    "text": "\\project_{bar} \\s"
+    "completions": [
+        "\\project_{bar} \\select_{"
+    ]
+}
