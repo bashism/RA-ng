@@ -15,11 +15,13 @@ public abstract class QueryResult implements IQueryResult {
 
     private static final String errorNameKey = "name";
     private static final String errorDescriptionKey = "description";
+    private static final String errorDetailsKey = "details";
     private static final String errorMessageKey = "message";
+    private static final String errorStackTraceKey = "stackTrace";
 
     protected static final String dataTextKey = "text";
     protected static final String dataRelationsKey = "relations";
-    protected static final String dataTuplesKey = "tuples"; 
+    protected static final String dataTuplesKey = "tuples";
 
     private JSONObject result;
 
@@ -42,11 +44,24 @@ public abstract class QueryResult implements IQueryResult {
 
     private JSONArray makeErrorJson(List<RAException> exceptions){
         JSONArray errors = new JSONArray();
+        // add all the new fields
+        /*   
+    public String details(){
+        return details;
+    }
+    public String message(){
+        return message;
+    }
+    public String stackTrace(){
+        return stackTrace;
+    }*/
         for (RAException exception: exceptions) {
             JSONObject errorJson = new JSONObject();
             errorJson.put(errorNameKey, exception.name());
             errorJson.put(errorDescriptionKey, exception.description());
+            errorJson.put(errorDetailsKey, exception.details());
             errorJson.put(errorMessageKey, exception.message());
+            //errorJson.put(errorStackTraceKey, exception.stackTrace());
             errors.put(errorJson);
         }
         return errors;
