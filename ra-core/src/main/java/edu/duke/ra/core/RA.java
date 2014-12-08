@@ -41,7 +41,6 @@ public class RA {
     public IQueryResult query(String query) {
         ValueWithError<AST> queryASTGenerationResult = makeQueryAST(query);
         if (queryASTGenerationResult.hasError()) {
-            System.out.println(queryASTGenerationResult.error());
             return queryASTGenerationResult.error();
         }
         AST queryAST = queryASTGenerationResult.value();

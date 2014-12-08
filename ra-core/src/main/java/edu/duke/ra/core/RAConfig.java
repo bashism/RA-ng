@@ -1,6 +1,7 @@
 package edu.duke.ra.core;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Properties;
 
@@ -72,7 +73,11 @@ public class RAConfig {
         }
         else if (propsFileName.length() != 0) {
             Properties properties = new Properties();
-            properties.load(this.getClass().getResourceAsStream(propsFileName));
+            InputStream propsFile = this.getClass().getResourceAsStream(propsFileName);
+            if (propsFile == null) {
+                return "";
+            }
+            properties.load(propsFile);
             String newValue = properties.getProperty(property);
             if (newValue == null) {
                 return "";
