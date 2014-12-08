@@ -43,6 +43,21 @@
           <target>1.7</target>
         </configuration>
       </plugin>
+      <!-- copy dependencies to target/lib -->
+      <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/lib</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <!-- make the jar executable -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -51,7 +66,7 @@
           <archive>
             <manifest>
               <addClasspath>true</addClasspath>
-              <classpathPrefix>dependency/</classpathPrefix>
+              <classpathPrefix>lib/</classpathPrefix>
               <mainClass>edu.duke.ra.cli.Client</mainClass>
             </manifest>
           </archive>
