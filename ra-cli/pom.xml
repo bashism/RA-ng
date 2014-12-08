@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>edu.duke.ra.cli</groupId>
+  <groupId>edu.duke.ra</groupId>
   <artifactId>ra-cli</artifactId>
   <packaging>jar</packaging>
   <version>0.0.1</version>
@@ -9,7 +9,7 @@
   <description>A command line interface for interfacing with the core RA library</description>
   <dependencies>
     <dependency>
-      <groupId>edu.duke.ra.core</groupId>
+      <groupId>edu.duke.ra</groupId>
       <artifactId>ra-core</artifactId>
       <version>0.0.1</version>
     </dependency>
@@ -41,6 +41,20 @@
         <configuration>
           <source>1.7</source>
           <target>1.7</target>
+        </configuration>
+      </plugin>
+      <!-- make the jar executable -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+              <classpathPrefix>dependency/</classpathPrefix>
+              <mainClass>edu.duke.ra.cli.Client</mainClass>
+            </manifest>
+          </archive>
         </configuration>
       </plugin>
     </plugins>
