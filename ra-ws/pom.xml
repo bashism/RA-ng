@@ -53,6 +53,11 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>edu.duke.ra.core</groupId>
+      <artifactId>ra-core</artifactId>
+      <version>0.0.1</version>
+    </dependency>
   </dependencies>
 
   <properties>
