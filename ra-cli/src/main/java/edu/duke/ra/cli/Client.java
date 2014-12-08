@@ -2,9 +2,18 @@ package edu.duke.ra.cli;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.sql.*;
-import jargs.gnu.CmdLineParser;
+
+import org.json.JSONObject;
+
+import edu.duke.ra.core.RA;
+import edu.duke.ra.core.RAConfig;
+import edu.duke.ra.core.RAConfigException;
+import edu.duke.ra.core.result.Column;
+import edu.duke.ra.core.result.IQueryResult;
+import edu.duke.ra.core.util.PrettyPrinter;
 import antlr.RecognitionException;
 import antlr.TokenStreamException;
 import antlr.CommonAST;
@@ -12,27 +21,18 @@ import antlr.collections.AST;
 import jline.console.ConsoleReader;
 import jline.console.completer.StringsCompleter;
 
-public class RA {
+public class Client {
 
-    protected static PrintStream out = System.out;
-    protected static PrintStream err = System.err;
-    protected static InputStream in = null;
-    protected static ConsoleReader reader = null;
-    protected static DB db = null;
+    protected PrintStream out = System.out;
+    protected PrintStream err = System.err;
+    protected InputStream in = null;
+    protected ConsoleReader reader = null;
+    protected RA ra;
 
-    protected static void exit(int code) {
-        try {
-            if (db != null) db.close();
-        } catch (SQLException e) {
-            // Simply ignore.
-        }
-        System.exit(code);
-    }
-
-    protected static void welcome() {
+    protected void welcome() {
         out.println();
         out.println("RA: an interactive relational algebra interpreter");
-        out.println("Version " + RA.class.getPackage().getImplementationVersion() +
+        out.println("Version " + "3.0" +
                     " by Jun Yang (junyang@cs.duke.edu)");
         out.println("http://www.cs.duke.edu/~junyang/ra/");
         out.println("Type \"\\help;\" for help");
@@ -40,7 +40,7 @@ public class RA {
         return;
     }
 
-    protected static void usage() {
+    protected void usage() {
         out.println("Usage: ra [Options] [PROPS_FILE]");
         out.println("Options:");
         out.println("  -h: print this message, and exit");
@@ -61,20 +61,29 @@ public class RA {
         return;
     }
 
-    protected static void prompt(int line) {
+    protected void prompt(int line) {
         if (reader == null) return;
-        reader.setPrompt((line == 1)? "ra> " : "" + line + "> ");
+        reader.setPrompt(getPrompt(line));
         return;
     }
 
-    protected static void exit() {
+    protected String getPrompt(int line){
+        return (line == 1)? "ra> " : "" + line + "> ";
+    }
+ 
+    protected void exit() {
         out.println("Bye!");
         out.println();
         exit(0);
         return;
     }
 
-    protected static String getPassword(ConsoleReader reader) {
+    protected void exit(int code) {
+        ra.closeDBConnection();
+        System.exit(code);
+    }
+
+    protected String getPassword(ConsoleReader reader) {
         String password = null;
         try {
             password = reader.readLine("Password: ", new Character((char)0));
@@ -88,7 +97,7 @@ public class RA {
         return password;
     }
 
-    protected static void skipInput() {
+    protected void skipInput() {
         try {
             (new BufferedReader(new InputStreamReader(in))).readLine();
         } catch (IOException e) {
@@ -98,10 +107,12 @@ public class RA {
             exit(1);
         }
     }
-
-    public static void main(String[] args) {
-
-        welcome();
+    private RAConfig parseCommandLineArguments() throws IOException, RAConfigException{
+        return new RAConfig.Builder().build();
+    }
+/*
+    private RAConfig parseCommandLineArguments() {
+        
         CmdLineParser cmdLineParser = new CmdLineParser();
         CmdLineParser.Option helpO = cmdLineParser.addBooleanOption('h', "help");
         CmdLineParser.Option inputO = cmdLineParser.addStringOption('i', "input");
@@ -176,7 +187,7 @@ public class RA {
         Properties props = new Properties();
         InputStream propsIn = null;
         if (propsFileName == null) {
-            propsIn = RA.class.getResourceAsStream("ra.properties");
+            propsIn = Client.class.getResourceAsStream("ra.properties");
             if (propsIn == null) {
                 err.println("Error loading properties from /ra/ra.properties in the jar file");
                 exit(1);
@@ -236,134 +247,65 @@ public class RA {
                 "\\cross", "\\union", "\\diff", "\\intersect"
             }));
         }
-
-        DataInputStream din = new DataInputStream(in);
+        return null;
+    }
+    */
+    public void start(){
+        welcome();
+        RAConfig config = null;
+        RA ra = null;
+        try {
+            config = new RAConfig.Builder().url("jdbc:sqlite:/sample.db").build();
+            ra = new RA(config);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (RAConfigException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        in = System.in;
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         while (true) {
-            // Clean start every time.
-            prompt(1);
-            RALexer lexer = new RALexer(din);
-            RAParser parser = new RAParser(lexer);
-            try {
-                parser.start();
-                CommonAST ast = (CommonAST)parser.getAST();
-                evaluate(verbose, db, ast);
-            } catch (TokenStreamException e) {
-                skipInput();
-                err.println("Error tokenizing input:");
-                err.println(e.toString());
-                err.println("Rest of input skipped");
-                err.println();
-                continue;
-            } catch (RecognitionException e) {
-                skipInput();
-                err.println("Error parsing input:");
-                err.println(e.toString());
-                err.println("Rest of input skipped");
-                err.println();
-                continue;
+            int lineNumber = 1;
+            String line = "";
+            while (!line.contains(";")) {
+                out.print(getPrompt(lineNumber));
+                try {
+                    line += reader.readLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    break;
+                }
+                lineNumber++;
+            }
+            line += "\n";
+            IQueryResult result = ra.query(line);
+            String resultString = result.toJsonString();
+            //TODO: Handle errors
+            System.out.println(resultString);
+            JSONObject dataSection = new JSONObject(resultString).getJSONObject("data");
+            String resultType = dataSection.keys().next();
+            switch (resultType) {
+                case "tuples":
+                    List<Column> schema = PrettyPrinter.createSchemaFromJson(resultString);
+                    List<List<String>> entries = PrettyPrinter.createTuplesFromJson(resultString);
+                    out.print(PrettyPrinter.printTuples(schema, entries));
+                    break;
+                case "relations":
+                    List<String> relations = PrettyPrinter.createRelationsFromJson(resultString);
+                    out.print(PrettyPrinter.printRelations(relations));
+                    break;
+                case "text":
+                    out.print(dataSection.getString("text"));
+                    break;
             }
         }
     }
 
-    protected static void evaluate(boolean verbose, DB db, CommonAST ast) {
-        if (ast.getType() == RALexerTokenTypes.QUIT ||
-            ast.getType() == RALexerTokenTypes.EOF) {
-            exit();
-        } else if (ast.getType() == RALexerTokenTypes.HELP) {
-            out.println("Terminate your commands or expressions by \";\"");
-            out.println();
-            out.println("Commands:");
-            out.println("\\help: print this message");
-            out.println("\\quit: exit ra");
-            out.println("\\list: list all relations in the database");
-            out.println("\\sqlexec_{STATEMENT}: execute SQL in the database");
-            out.println();
-            out.println("Relational algebra expressions:");
-            out.println("R: relation named by R");
-            out.println("\\select_{COND} EXP: selection over an expression");
-            out.println("\\project_{ATTR_LIST} EXP: projection of an expression");
-            out.println("EXP_1 \\join EXP_2: natural join between two expressions");
-            out.println("EXP_1 \\join_{COND} EXP_2: theta-join between two expressions");
-            out.println("EXP_1 \\cross EXP_2: cross-product between two expressions");
-            out.println("EXP_1 \\union EXP_2: union between two expressions");
-            out.println("EXP_1 \\diff EXP_2: difference between two expressions");
-            out.println("EXP_1 \\intersect EXP_2: intersection between two expressions");
-            out.println("\\rename_{NEW_ATTR_NAME_LIST} EXP: rename all attributes of an expression");
-            out.println();
-        } else if (ast.getType() == RALexerTokenTypes.LIST) {
-            try {
-                ArrayList<String> tables = db.getTables();
-                out.println("-----");
-                for (int i=0; i<tables.size(); i++) {
-                    out.println(tables.get(i));
-                }
-                out.println("-----");
-                out.println("Total of " + tables.size() + " table(s) found.");
-                out.println();
-            } catch (SQLException e) {
-                err.println("Unexpected error obtaining list of tables from database");
-                db.printSQLExceptionDetails(e, err, verbose);
-                err.println();
-            }
-        } else if (ast.getType() == RALexerTokenTypes.SQLEXEC) {
-            try {
-                assert(ast.getFirstChild().getType() == RALexerTokenTypes.OPERATOR_OPTION);
-                String sqlCommands = ast.getFirstChild().getText();
-                db.execCommands(out, sqlCommands);
-            } catch (SQLException e) {
-                err.println("Error executing SQL commands");
-                db.printSQLExceptionDetails(e, err, verbose);
-                err.println();
-            }
-        } else {
-            RAXNode rax = null;
-            try {
-                RAXConstructor constructor = new RAXConstructor();
-                RAXNode.resetViewNameGenerator();
-                rax = constructor.expr(ast);
-                if (verbose) {
-                    out.println("Parsed query:");
-                    rax.print(verbose, 0, out);
-                    out.println("=====");
-                }
-                rax.validate(db);
-                if (verbose) {
-                    out.println("Validated query:");
-                    rax.print(verbose, 0, out);
-                    out.println("=====");
-                }
-                rax.execute(db, out);
-            } catch (RecognitionException e) {
-                // From constructor.expr():
-                err.println("Unexpected error constructing queries from parse tree:");
-                err.println(e.toString());
-                err.println();
-            } catch (RAXNode.ValidateException e) {
-                // From rax.validate():
-                err.println("Error validating subquery:");
-                e.getErrorNode().print(true, 0, err);
-                if (e.getMessage() != null) {
-                    err.println(e.getMessage());
-                }
-                if (e.getSQLException() != null) {
-                    db.printSQLExceptionDetails(e.getSQLException(), err, verbose);
-                }
-                err.println();
-            } catch (SQLException e) {
-                // From rax.execute():
-                err.println("Unexpected error executing validated query:");
-                db.printSQLExceptionDetails(e, err, verbose);
-                err.println();
-            }
-            // Remember to clean up the views created by rax:
-            try {
-                if (rax != null) rax.clean(db);
-            } catch (SQLException e) {
-                err.println("Unexpected error cleaning up query");
-                db.printSQLExceptionDetails(e, err, verbose);
-                err.println();
-            }
-        }
-        return;
+    public static void main(String[] args) {
+        Client client = new Client();
+        client.start();
     }
+
 }
