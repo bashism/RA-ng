@@ -29,6 +29,14 @@ public class RA {
         this.config = config;
         this.database = config.configureDB();
     }
+    
+    public void closeDBConnection(){
+        try {
+            if (database != null) database.close();
+        } catch (SQLException e) {
+            // Simply ignore.
+        }
+    }
 
     public IQueryResult query(String query) {
         ValueWithError<AST> queryASTGenerationResult = makeQueryAST(query);
