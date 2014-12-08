@@ -16,7 +16,7 @@ import edu.duke.ra.core.RAConfigException;
 /**
  * The request handler for the RA web API
  */
-@Path("api")
+@Path("api/query")
 public class ApiHandler {
 
     @GET
