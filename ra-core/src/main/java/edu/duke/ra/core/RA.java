@@ -8,6 +8,8 @@ import antlr.collections.AST;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.io.*;
 
 import edu.duke.ra.core.db.DB;
@@ -39,7 +41,12 @@ public class RA {
     }
 
     public IQueryResult query(String query) {
-        ValueWithError<AST> queryASTGenerationResult = makeQueryAST(query);
+        ValueWithError<String> strippedTables = validateAndStripTableReferences(query);
+        if (strippedTables.hasError()) {
+            return strippedTables.error();
+        }
+        String queryInternal = strippedTables.value();
+        ValueWithError<AST> queryASTGenerationResult = makeQueryAST(queryInternal);
         if (queryASTGenerationResult.hasError()) {
             return queryASTGenerationResult.error();
         }
@@ -65,6 +72,46 @@ public class RA {
         parser.start();
         AST ast = parser.getAST();
         return ast;
+    }
+    ValueWithError<String> validateAndStripTableReferences(String rawQuery) {
+        Pattern tableName = Pattern.compile("@(\\w+(\\.\\w+)?)");
+        Matcher tableMatches = tableName.matcher(rawQuery);
+        List<String> tables = new ArrayList<>();
+        while (tableMatches.find()){
+            String columnReference = tableMatches.group(1);
+            String table = columnReference.split("\\.")[0];
+            tables.add(table);
+        }
+        List<RAException> errors = new ArrayList<>();
+        List<String> dbTables;
+        try {
+            dbTables = database.getTables();
+        } catch (SQLException exception) {
+            errors.add(new RAException(
+                    "SQLException",
+                    "Error retrieving tables from the database",
+                    "SQLState: " + exception.getSQLState() + "\n",
+                    exception));
+            return new ValueWithError<String>(
+                    null, new ErrorResult(rawQuery, errors));
+        }
+        boolean hasErrors = false;
+        for (String table: tables) {
+            if (! dbTables.contains(table)) {
+                hasErrors = true;
+                errors.add(new RAException(
+                        "InvalidTableReference",
+                        "The referenced table does not exist in the database",
+                        "Table: " + table + "\n",
+                        new Exception()));
+            }
+        }
+        if (hasErrors) {
+            return new ValueWithError<String>(
+                    null, new ErrorResult(rawQuery, errors));
+        }
+        String query = tableMatches.replaceAll("$1");
+        return new ValueWithError<String>(query, null);
     }
     ValueWithError<AST> makeQueryAST(String query) {
         List<RAException> errors = new ArrayList<>();

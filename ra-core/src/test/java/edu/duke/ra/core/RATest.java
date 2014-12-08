@@ -13,6 +13,7 @@ import org.junit.BeforeClass;
 import edu.duke.ra.core.db.DB;
 import edu.duke.ra.core.operator.RAXNode;
 import edu.duke.ra.core.result.IQueryResult;
+import edu.duke.ra.core.result.ValueWithError;
 import antlr.CommonAST;
 import antlr.RecognitionException;
 import antlr.TokenStreamException;
@@ -66,5 +67,13 @@ public class RATest {
         AST selectRelation = selectPredicate.getNextSibling();
         assertEquals("beer", selectRelation.getText());
         assertEquals(0, selectRelation.getNumberOfChildren());
+    }
+
+    @Test
+    public void testValidateAndStripTableReferences(){
+        String expected = "_{Beer.foo=Bar.foo} Bar";
+        ValueWithError<String> result = ra.validateAndStripTableReferences("_{@Beer.foo=@Bar.foo} @Bar");
+        String resultValue = result.value();
+        assertEquals(expected, resultValue);
     }
 }
