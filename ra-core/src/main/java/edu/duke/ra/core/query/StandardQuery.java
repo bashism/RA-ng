@@ -52,7 +52,7 @@ public class StandardQuery extends DatabaseQuery {
         catch (RecognitionException exception) {
             errors.add(new RAException(
                     "RecognitionException",
-                    "An syntax error generating commands",
+                    "An syntax error generating commands occurred",
                     "Line: " + exception.getLine() + "\n"
                     + "Column: " + exception.getColumn() + "\n",
                     exception));
@@ -87,7 +87,7 @@ public class StandardQuery extends DatabaseQuery {
         catch (SQLException exception) {
             errors.add(new RAException(
                     "SQLException",
-                    "An error generating the SQL of this RA command",
+                    "An error generating the SQL of this RA command occurred",
                     "SQLState: " + exception.getSQLState() + "\n",
                     exception));
             return new ValueWithError<String>(null, new ErrorResult(raQueryString, errors));
@@ -95,7 +95,7 @@ public class StandardQuery extends DatabaseQuery {
         catch (ValidateException exception) {
             errors.add(new RAException(
                     "ValidateException",
-                    "An error validating the RA commands",
+                    "An error validating the RA commands occurred",
                     "Command: " + exception.getErrorNode().toPrintString() + "\n",
                     exception));
             return new ValueWithError<String>(null, new ErrorResult(raQueryString, errors));
@@ -141,7 +141,7 @@ public class StandardQuery extends DatabaseQuery {
         } catch (SQLException exception) {
             errors.add(new RAException(
                     "SQLException",
-                    "An error executing the SQL query",
+                    "An error executing the SQL query occurred",
                     "SQLState: " + exception.getSQLState() + "\n",
                     exception));
             return new ErrorResult(raQueryString, errors);

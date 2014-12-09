@@ -89,7 +89,7 @@ public class RA {
         } catch (SQLException exception) {
             errors.add(new RAException(
                     "SQLException",
-                    "Error retrieving tables from the database",
+                    "An error retrieving tables from the database occurred",
                     "SQLState: " + exception.getSQLState() + "\n",
                     exception));
             return new ValueWithError<String>(
@@ -122,7 +122,7 @@ public class RA {
         catch (RecognitionException exception) {
             RAException newError = new RAException(
                     "RecognitionException", 
-                    "An error parsing the RA query string",
+                    "An error parsing the RA query string occurred",
                     "Line: " + exception.getLine() + "\n"
                     + "Column: " + exception.getColumn() + "\n",
                     exception);
@@ -132,7 +132,7 @@ public class RA {
         catch (TokenStreamException exception) {
             RAException newError = new RAException(
                     "TokenStreamException",
-                    "An error generating tokens for this RA query string",
+                    "An error generating tokens for this RA query string occurred",
                     "",
                     exception);
             errors.add(newError);

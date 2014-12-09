@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Properties;
 import java.sql.*;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import edu.duke.ra.core.RA;
@@ -277,28 +278,46 @@ public class Client {
             line += "\n";
             IQueryResult result = ra.query(line);
             String resultString = result.toJsonString();
-            //TODO: Handle errors
-            System.out.println(resultString);
             JSONObject resultJson = new JSONObject(resultString);
-            JSONObject dataSection = resultJson.getJSONObject("data");
-            String resultType = dataSection.keys().next();
-            switch (resultType) {
-                case "tuples":
-                    List<Column> schema = PrettyPrinter.createSchemaFromJson(resultString);
-                    List<List<String>> entries = PrettyPrinter.createTuplesFromJson(resultString);
-                    out.print(PrettyPrinter.printTuples(schema, entries));
-                    break;
-                case "relations":
-                    List<String> relations = PrettyPrinter.createRelationsFromJson(resultString);
-                    out.print(PrettyPrinter.printRelations(relations));
-                    break;
-                case "text":
-                    out.print(dataSection.getString("text"));
-                    break;
+            JSONArray errors = resultJson.getJSONArray("errors");
+            if (errors.length() != 0) {
+                for (int i = 0; i < errors.length(); i++){
+                    JSONObject error = errors.getJSONObject(i);
+                    String errorMessage = error.getString("description") + ":\n";
+                    if (error.has("message")) {
+                        errorMessage += error.getString("message") + "\n";
+                    }
+                    if (error.has("details")) {
+                        errorMessage += error.getString("details") + "\n";
+                    }
+                    out.print(errorMessage);
+                }
+            }
+            else {
+                printResult(resultString);
             }
             if (resultJson.getBoolean("quit")) {
                 break;
             }
+        }
+    }
+    void printResult(String resultString) {
+        JSONObject resultJson = new JSONObject(resultString);
+        JSONObject dataSection = resultJson.getJSONObject("data");
+        String resultType = dataSection.keys().next();
+        switch (resultType) {
+            case "tuples":
+                List<Column> schema = PrettyPrinter.createSchemaFromJson(resultString);
+                List<List<String>> entries = PrettyPrinter.createTuplesFromJson(resultString);
+                out.print(PrettyPrinter.printTuples(schema, entries));
+                break;
+            case "relations":
+                List<String> relations = PrettyPrinter.createRelationsFromJson(resultString);
+                out.print(PrettyPrinter.printRelations(relations));
+                break;
+            case "text":
+                out.print(dataSection.getString("text"));
+                break;
         }
     }
 
