@@ -1,5 +1,6 @@
 package edu.duke.ra.core;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -9,12 +10,14 @@ import edu.duke.ra.core.db.DB;
 
 public class RAConfig {
     private final String propsFileName;
+    private final boolean internalPropsFile;
     private final boolean verbose;
     private Properties properties;
 
     public static class Builder {
         private boolean verbose = false;
         private String propsFileName = "/ra.properties";
+        private boolean internalPropsFile = true;
         private String url = "";
         private String schema = "";
         private String user = "";
@@ -25,6 +28,7 @@ public class RAConfig {
         }
         public Builder propsFileName(String name) {
             this.propsFileName = name;
+            this.internalPropsFile = false;
             return this;
         }
         public Builder url(String url) {
@@ -50,6 +54,7 @@ public class RAConfig {
 
     private RAConfig(Builder builder) throws IOException {
         this.propsFileName = builder.propsFileName;
+        this.internalPropsFile = builder.internalPropsFile;
         this.verbose = Boolean.parseBoolean(getValueOf("verbose", Boolean.toString(builder.verbose)));
         this.properties = new Properties();
         this.properties.put("url", getValueOf("url", builder.url));
@@ -73,7 +78,13 @@ public class RAConfig {
         }
         else if (propsFileName.length() != 0) {
             Properties properties = new Properties();
-            InputStream propsFile = this.getClass().getResourceAsStream(propsFileName);
+            InputStream propsFile;
+            if (internalPropsFile) {
+                propsFile = this.getClass().getResourceAsStream(propsFileName);
+            }
+            else {
+                propsFile = new FileInputStream(propsFileName);
+            }
             if (propsFile == null) {
                 return "";
             }
