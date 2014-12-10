@@ -6,7 +6,6 @@ import java.util.List;
 import edu.duke.ra.core.RAException;
 
 public class HelpQueryResult extends RawStringQueryResult {
-    private static final String query = "\\help;\n";
     private static final String helpMessage = ""
             + "Terminate your commands or expressions by \";\" \n"
             + "\n"
@@ -31,7 +30,7 @@ public class HelpQueryResult extends RawStringQueryResult {
             ;
     private static final List<RAException> errors = new ArrayList<>();
 
-    public HelpQueryResult() {
+    public HelpQueryResult(String query) {
         super(query, helpMessage, errors);
     }
 }

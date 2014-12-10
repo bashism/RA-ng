@@ -8,10 +8,11 @@ import org.json.JSONObject;
 import edu.duke.ra.core.RAException;
 
 public class QuitQueryResult extends QueryResult {
-    private static final String query = "\\quit;\n";
     private static final String quitMessage = "Bye!\n\n";
+    private final String query;
 
-    public QuitQueryResult(){
+    public QuitQueryResult(String query){
+        this.query = query;
         makeResult();
     }
 

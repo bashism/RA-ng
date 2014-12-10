@@ -54,9 +54,9 @@ public class RA {
 
         switch (queryAST.getType()) {
             case RALexerTokenTypes.QUIT: case RALexerTokenTypes.EOF:
-                return new QuitQueryResult();
+                return new QuitQueryResult(query);
             case RALexerTokenTypes.HELP:
-                return new HelpQueryResult();
+                return new HelpQueryResult(query);
             case RALexerTokenTypes.LIST:
                 return new ListRelationQuery(database).query(queryAST, query, this.config.verbose());
             case RALexerTokenTypes.SQLEXEC:
