@@ -6,7 +6,6 @@
   <packaging>war</packaging>
   <version>0.0.1</version>
   <name>RA web service</name>
-
   <build>
     <plugins>
       <!-- force Java 7, per https://jersey.java.net/documentation/2.13/modules-and-dependencies.html#d0e560 -->
