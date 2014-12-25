@@ -136,70 +136,6 @@ public class DB {
         return;
     }
 
-    public void printResultSet(PrintStream out, ResultSet rs)
-        throws SQLException {
-        ResultSetMetaData rsmd = rs.getMetaData();
-        // Print result heading:
-        out.print("Output schema: (");
-        int numCols = rsmd.getColumnCount();
-        for (int i=1; i<=numCols; i++) {
-            if (i>1) out.print(", ");
-            out.print(rsmd.getColumnName(i) + " " + rsmd.getColumnTypeName(i));
-        }
-        out.println(")");
-        out.println("-----");
-        // Print result content:
-        int count = 0;
-        while (rs.next()) {
-            for (int i=1; i<=numCols; i++) {
-                if (i>1) out.print("|");
-                String colString;
-                switch (rsmd.getColumnType(i)) {
-                case Types.INTEGER:
-                    colString = String.valueOf(rs.getInt(i));
-                    break;
-                case Types.SMALLINT:
-                    colString = String.valueOf(rs.getShort(i));
-                    break;
-                case Types.DOUBLE:
-                    colString = String.valueOf(rs.getDouble(i));
-                    break;
-                case Types.FLOAT:
-                case Types.REAL:
-                    colString = String.valueOf(rs.getFloat(i));
-                    break;
-                case Types.DECIMAL:
-                case Types.NUMERIC:
-                    colString = rs.getBigDecimal(i).toString();
-                    break;
-                case Types.DATE:
-                    colString = rs.getDate(i).toString();
-                    break;
-                case Types.CHAR:
-                case Types.VARCHAR:
-                    colString = rs.getString(i);
-                    break;
-                default:
-                    colString = null;
-                    break;
-                }
-                if (colString == null) {
-                    colString = "<TYPE UNSUPPORTED>";
-                } else if (rs.wasNull()) {
-                    colString = "<NULL>";
-                }
-                out.print(colString);
-            }
-            out.println();
-            count++;
-        }
-        // Print result summary:
-        out.println("-----");
-        out.println("Total number of rows: " + count);
-        out.println();
-        return;
-    }
-
     public IQueryResult executeQuery(String query, String raQueryString, boolean verbose) throws SQLException {
         List<RAException> errors = new ArrayList<>();
         ResultSet resultSet = null;
@@ -207,16 +143,6 @@ public class DB {
         resultSet = statement.executeQuery(query);
         IQueryResult result = new StandardQueryResult(resultSet, errors, raQueryString, query);
         return result;
-    }
-
-    public void execQueryAndOutputResult(PrintStream out, String query)
-        throws SQLException {
-    	Statement s = _conn.createStatement();
-        ResultSet rs = s.executeQuery(query);
-        printResultSet(out, rs);
-        rs.close();
-        s.close();
-        return;
     }
 
     public ArrayList<String> getTables()
@@ -230,25 +156,6 @@ public class DB {
         }
         rs.close();
         return tableNames;
-    }
-
-    public TableSchema getOutputSchema(String query)
-        throws SQLException {
-        ArrayList<String> colNames = new ArrayList<String>();
-        ArrayList<String> colTypes = new ArrayList<String>();
-        Statement s = _conn.createStatement();
-        ResultSet rs = s.executeQuery(query);
-        ResultSetMetaData rsmd = rs.getMetaData();
-        int numCols = rsmd.getColumnCount();
-        for (int i=1; i<=numCols; i++) {
-            // Important: Use getColumnLabel() to get new column names specified
-            // in AS or in CREATE VIEW.  For some JDBC drivers, getColumnName()
-            // gives the original column names inside base tables.
-            colNames.add(rsmd.getColumnLabel(i));
-            colTypes.add(rsmd.getColumnTypeName(i));
-        }
-        rs.close();
-        return new TableSchema(null, colNames, colTypes);
     }
 
     public TableSchema getTableSchema(String tableName)
@@ -278,22 +185,22 @@ public class DB {
     //     return new TableSchema(tableName, colNames, colTypes);
     // }
 
-    /*
-    public void createView(String createViewStatement)
-        throws SQLException {
-        Statement s = _conn.createStatement();
-        s.executeUpdate(createViewStatement);
-        s.close();
-        return;
+    public TableSchema getOutputSchema(String query)
+            throws SQLException {
+            ArrayList<String> colNames = new ArrayList<String>();
+            ArrayList<String> colTypes = new ArrayList<String>();
+            Statement s = _conn.createStatement();
+            ResultSet rs = s.executeQuery(query);
+            ResultSetMetaData rsmd = rs.getMetaData();
+            int numCols = rsmd.getColumnCount();
+            for (int i=1; i<=numCols; i++) {
+                // Important: Use getColumnLabel() to get new column names specified
+                // in AS or in CREATE VIEW.  For some JDBC drivers, getColumnName()
+                // gives the original column names inside base tables.
+                colNames.add(rsmd.getColumnLabel(i));
+                colTypes.add(rsmd.getColumnTypeName(i));
+            }
+            rs.close();
+            return new TableSchema(null, colNames, colTypes);
     }
-
-    public void dropView(String viewName)
-        throws SQLException {
-        Statement s = _conn.createStatement();
-        s.executeUpdate("DROP VIEW " + viewName);
-        s.close();
-        return;
-    }
-    */
-
 }

@@ -66,33 +66,6 @@ public abstract class RAXNode {
         return;
     }
 
-    public void validate(DB db)
-        throws ValidateException {
-        // Validate children first; any exception thrown there
-        // will shortcut the call.
-        for (int i=0; i<getNumChildren(); i++) {
-            getChild(i).validate(db);
-        }
-        try {
-            _outputSchema = db.getTableSchema(_viewName);
-            assert(_outputSchema != null);
-        } catch (SQLException e) {
-            _status = Status.ERROR;
-            // Wrap and re-throw the exception for caller to handle.
-            throw new ValidateException(e, this);
-        }
-        // Everything rooted at this node went smoothly.
-        _status = Status.CORRECT;
-        return;
-    }
-
-    public void execute(DB db, PrintStream out)
-        throws SQLException {
-        assert(_status == Status.CORRECT);
-        db.execQueryAndOutputResult(out, "SELECT * FROM " + _viewName);
-        return;
-    }
-
     public static List<String> parseColumnNames(String columns) {
         String[] columnNames = columns.split("\\s*,\\s*");
         return Arrays.asList(columnNames);
