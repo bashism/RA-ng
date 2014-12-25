@@ -15,9 +15,9 @@ public class DB {
 
     public static void printSQLExceptionDetails(SQLException sqle, PrintStream err, boolean verbose) {
         while (sqle != null) {
-            System.out.println("Error message: " + sqle.getMessage());
-            System.out.println("Error code: " + sqle.getErrorCode());
-            System.out.println("SQL state: " + sqle.getSQLState());
+            err.println("Error message: " + sqle.getMessage());
+            err.println("Error code: " + sqle.getErrorCode());
+            err.println("SQL state: " + sqle.getSQLState());
             sqle = sqle.getNextException();
         }
         return;
